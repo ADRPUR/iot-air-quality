@@ -36,12 +36,12 @@ jobs:
           docker run --rm \
             -v "$PWD/infra/mosquitto/generated:/mosquitto/config" \
             eclipse-mosquitto \
-            mosquitto_passwd -c -b /mosquitto/config/passwd \
-              "${{ secrets.MQTT_USER }}" "${{ secrets.MQTT_PASS }}"
-
-          printf "user %s\ntopic sensors/#\n" "${{ secrets.MQTT_USER }}" \
-            > infra/mosquitto/generated/acl
-          chmod 600 infra/mosquitto/generated/*
+            /bin/sh -c "\
+              mosquitto_passwd -c -b /mosquitto/config/passwd \
+                '${{ secrets.MQTT_USER }}' '${{ secrets.MQTT_PASS }}' && \
+              printf 'user %s\ntopic sensors/#\n' '${{ secrets.MQTT_USER }}' \
+                > /mosquitto/config/acl && \
+              chmod 600 /mosquitto/config/*"
 
       # ─── 5. compute lower-case image name ─────────────────────────────
       - id: vars
