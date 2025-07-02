@@ -17,3 +17,6 @@ __pycache__/
 # Docker artefacts
 *.log
 *.tmp
+/infra/mosquitto/acl
+/infra/mosquitto/passwd
+/infra/mosquitto/generated/

@@ -1,0 +1,2 @@
+# This is only a placeholder.
+# The real passwd file is built at CI-time with mosquitto_passwd

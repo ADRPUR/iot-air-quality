@@ -30,4 +30,6 @@ spring:
 mqtt:
   broker: tcp://localhost:1883
   client-id: ingest-service
+  username: iotuser
+  password: supersecret
   topic: sensors/#
