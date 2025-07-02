@@ -6,5 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record MqttConfigProperties(
         String broker,
         String clientId,
-        String topic
+        String topic,
+        String username,
+        String password
 ) {}

@@ -14,9 +14,9 @@ const charts = [
     { sensor: "mq135_1", field: "air_quality",  color: "#ef4444" },
 
     // PMS5003
-    { sensor: "pms5003_1", field: "pm1",  color: "#60a5fa" },
-    { sensor: "pms5003_1", field: "pm25", color: "#3b82f6" },
-    { sensor: "pms5003_1", field: "pm10", color: "#2563eb" },
+    { sensor: "pms5003_1", field: "pm1",  color: "#BA487F" },
+    { sensor: "pms5003_1", field: "pm25", color: "#FF9587" },
+    { sensor: "pms5003_1", field: "pm10", color: "#03A6A1" },
 ];
 
 export default function Dashboard() {

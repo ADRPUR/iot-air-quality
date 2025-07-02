@@ -13,6 +13,8 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,10 +28,21 @@ public class MqttListener implements MqttCallback {
     private IMqttClient client;                            // warning about “could be local” is harmless
 
     @PostConstruct
-    void init() throws MqttException {
+    void init() throws MqttException, InterruptedException {
+        MqttConnectionOptions opts = new MqttConnectionOptions();
+        opts.setUserName(props.username());
+        opts.setPassword(props.password().getBytes(StandardCharsets.UTF_8));
         client = new MqttClient(props.broker(), props.clientId(), null);
         client.setCallback(this);
-        client.connect();
+        for (int i=0; i<10; i++) {
+            try {
+                client.connect(opts);
+                break;
+            } catch (MqttException ex) {
+                log.warn("MQTT connect failed, retry {}", i+1);
+                Thread.sleep(2000);
+            }
+        }
         client.subscribe(props.topic(), 1);
         log.info("MQTT connected to {} and subscribed to {}", props.broker(), props.topic());
     }
