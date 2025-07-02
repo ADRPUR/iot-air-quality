@@ -1,0 +1,19 @@
+# Java / Maven
+ingest-service/target/
+*.iml
+.idea/
+
+# Node / React
+frontend-dashboard/node_modules/
+frontend-dashboard/dist/
+frontend-dashboard/.vite/
+frontend-dashboard/.env
+frontend-dashboard/.idea
+
+# Python
+*.pyc
+__pycache__/
+
+# Docker artefacts
+*.log
+*.tmp

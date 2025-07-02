@@ -1,0 +1,18 @@
+type Metric {
+    time:      String
+    sensorId:  String
+    field:     String
+    value:     Float
+}
+
+type Query {
+    # existing:
+    latestMetrics(limit: Int = 20): [Metric]
+
+    # new:
+    latestMetricsBySensor(
+        sensorId: String!
+        field:    String!
+        limit:    Int = 20
+    ): [Metric]
+}

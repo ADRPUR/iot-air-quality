@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smarthome
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 8          # adjust if needed
+
+  jpa:
+    hibernate:
+      ddl-auto: none                # we manage schema manually
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  graphql:               # ← moved under the same 'spring' root
+    path: /graphql
+    websocket:
+      path: /graphql
+
+# MQTT custom section (used by MqttListener)
+mqtt:
+  broker: tcp://localhost:1883
+  client-id: ingest-service
+  topic: sensors/#
