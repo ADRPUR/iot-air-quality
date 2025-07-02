@@ -32,14 +32,16 @@ jobs:
       - name: Generate Mosquitto passwd/acl
         run: |
           mkdir -p infra/mosquitto/generated
+
           docker run --rm \
             -v "$PWD/infra/mosquitto/generated:/mosquitto/config" \
             eclipse-mosquitto \
-            mosquitto_passwd -b /mosquitto/config/passwd \
+            mosquitto_passwd -c -b /mosquitto/config/passwd \
               "${{ secrets.MQTT_USER }}" "${{ secrets.MQTT_PASS }}"
+
           printf "user %s\ntopic sensors/#\n" "${{ secrets.MQTT_USER }}" \
             > infra/mosquitto/generated/acl
-          ls -l infra/mosquitto/generated   # debug
+          chmod 600 infra/mosquitto/generated/*
 
       # ─── 5. compute lower-case image name ─────────────────────────────
       - id: vars
