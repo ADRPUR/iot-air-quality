@@ -1,56 +1,71 @@
 #!/usr/bin/env python3
 """
-Fake sensor publisher for demo purposes.
+Fake sensor publisher for the IoT Air-Quality PoC.
 
-Publishes temperature, humidity and PM2.5 messages to MQTT every 2 s.
+Topics:
+  sensors/living/<sensor_id>
 
-Topic format:  sensors/<room>/<sensor>
-Payload JSON:  {
+Payload:
+  {
     "sensor": "dht22_1",
-    "field":  "temperature" | "humidity" | "pm25",
-    "value":  float,
-    "ts":     ISO-8601 timestamp
-}
+    "field":  "temperature" | "humidity" | "pressure"
+              | "air_quality" | "pm1" | "pm25" | "pm10",
+    "value":  <float>,
+    "ts":     "<ISO-8601 UTC>"
+  }
 """
 
 import json
 import random
 import time
 from datetime import datetime, timezone
-
-from faker import Faker
 from paho.mqtt import publish
 
-fake = Faker()
+# ───────────────────  CONFIG  ───────────────────
+BROKER = "localhost"                 # or "mosquitto" inside Docker net
+PORT   = 1883
+MQTT_USER = "iotuser"
+MQTT_PASS = "supersecret"
+DELAY  = 5                           # seconds between publish rounds
+ROOM   = "living"
+# ────────────────────────────────────────────────
 
-BROKER = "localhost"
-TOPIC  = "sensors/living/dht22"
-DELAY  = 5           # seconds between *each* message
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
 
-def send(field: str, value: float) -> None:
-    """Compose payload and publish to MQTT."""
+def send(sensor: str, field: str, value: float):
     payload = {
-        "sensor": "dht22_1",
+        "sensor": sensor,
         "field":  field,
         "value":  round(value, 2),
-        "ts":     datetime.now(timezone.utc).isoformat()
+        "ts":     now_iso(),
     }
     publish.single(
-        topic=TOPIC,
+        topic=f"sensors/{ROOM}/{sensor}",
         payload=json.dumps(payload),
+        hostname=BROKER,
+        port=PORT,
         qos=1,
-        hostname=BROKER
+        auth={"username": MQTT_USER, "password": MQTT_PASS},
     )
-    print("→ sent", payload)
+    print("→", payload)
 
 while True:
-    # Temperature 18–22 °C
-    send("temperature", 20 + random.uniform(-2, 2))
+    # DHT22
+    send("dht22_1", "temperature", 20 + random.uniform(-2, 2))
+    send("dht22_1", "humidity",    50 + random.uniform(-10, 10))
 
-    # Humidity 40–60 %
-    send("humidity", 50 + random.uniform(-10, 10))
+    # BME280
+    send("bme280_1", "temperature", 20 + random.uniform(-1.5, 1.5))
+    send("bme280_1", "humidity",    45 + random.uniform(-8, 8))
+    send("bme280_1", "pressure",    1013 + random.uniform(-5, 5))   # hPa
 
-    # PM2.5 5–30 µg/m³
-    send("pm25", random.uniform(5, 30))
+    # MQ135 (air-quality index proxy)
+    send("mq135_1", "air_quality", 100 + random.uniform(-20, 20))   # ppm-equiv CO₂
+
+    # PMS5003 (particulate matter)
+    send("pms5003_1", "pm1",  random.uniform(0, 10))
+    send("pms5003_1", "pm25", random.uniform(5, 35))
+    send("pms5003_1", "pm10", random.uniform(10, 50))
 
     time.sleep(DELAY)

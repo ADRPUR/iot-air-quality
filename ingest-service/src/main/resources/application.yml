@@ -1,35 +1,61 @@
+server:
+  port: 8080
+
+# ───────────────────────────────────────── MQTT ─────────────────────────────────────────
+mqtt:
+  broker:   ${MQTT_BROKER:tcp://localhost:1883}
+  clientId: ingest-service
+  topic:    sensors/#
+  username: ${MQTT_USER:iotuser}
+  password: ${MQTT_PASS:supersecret}
+
+# ───────────────────────────────────────── Spring ────────────────────────────────────────
 spring:
+
+  # PostgreSQL / Timescale
   datasource:
-    url: jdbc:postgresql://localhost:5432/smarthome
-    username: postgres
-    password: postgres
+    url:      ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/smarthome}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 8          # adjust if needed
+      maximum-pool-size: 8
 
   jpa:
     hibernate:
-      ddl-auto: none                # we manage schema manually
+      ddl-auto: none
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
 
+  # Kafka
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer:   org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-  graphql:               # ← moved under the same 'spring' root
+  # GraphQL endpoint
+  graphql:
     path: /graphql
     websocket:
       path: /graphql
 
-# MQTT custom section (used by MqttListener)
-mqtt:
-  broker: tcp://localhost:1883
-  client-id: ingest-service
-  username: iotuser
-  password: supersecret
-  topic: sensors/#
+# ────────────────────────────────────── Actuator / Prometheus ───────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus        # /actuator/health, /actuator/prometheus
+  endpoint:
+    prometheus.enabled: true
+  metrics.export.prometheus.enabled: true
+  # if you want a separate port for Prometheus:
+  # server.port: 9090
+
+# ───────────────────────────────────────── Logging ───────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.example.iot.ingest: INFO
+    org.eclipse.paho: WARN

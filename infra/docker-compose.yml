@@ -91,6 +91,26 @@ services:
       MQTT_BROKER: tcp://mosquitto:1883
     networks: [ iot-net ]
 
+  # ---------------- Prometheus  ----------------
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [iot-net]
+
+  # ---------------- Grafana  ----------------
+  grafana:
+    image: grafana/grafana-oss:10.4.3
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on: [ prometheus ]
+    networks: [ iot-net ]
 # ---------------- Networks & Volumes ----------------
 networks:
   iot-net:

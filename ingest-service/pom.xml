@@ -109,6 +109,18 @@
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
 
+    <!-- Micrometer metrics -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+
+    <!-- Spring Boot Actuator -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
     <!-- ::::::::::: -->
     <!--   Tests     -->
     <!-- ::::::::::: -->
@@ -170,27 +182,6 @@
           <layers enabled="true"/>
         </configuration>
       </plugin>
-
-      <!-- Toolchains: ensure JDK 21 in local & CI -->
-<!--      <plugin>-->
-<!--        <groupId>org.apache.maven.plugins</groupId>-->
-<!--        <artifactId>maven-toolchains-plugin</artifactId>-->
-<!--        <version>3.1.0</version>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <goals><goal>toolchain</goal></goals>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--        <configuration>-->
-<!--          <toolchains>-->
-<!--            <jdk>-->
-<!--              <version>${java.version}</version>-->
-<!--              <vendor>temurin</vendor>-->
-<!--            </jdk>-->
-<!--          </toolchains>-->
-<!--        </configuration>-->
-<!--      </plugin>-->
-
     </plugins>
   </build>
 </project>
