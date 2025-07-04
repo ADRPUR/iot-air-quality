@@ -15,7 +15,7 @@ services:
 
   # ---------------- Zookeeper & Kafka ----------------
   zookeeper:
-    profiles: [ "prod" ]
+#    profiles: [ "prod" ]
     image: confluentinc/cp-zookeeper:7.6.0
     restart: unless-stopped
     environment:
@@ -27,7 +27,7 @@ services:
       - iot-net
 
   kafka:
-    profiles: [ "prod" ]
+#    profiles: [ "prod" ]
     image: confluentinc/cp-kafka:7.6.0
     restart: unless-stopped
     depends_on:
@@ -54,7 +54,7 @@ services:
 
   # ---------------- Kafka UI ----------------
   kafka-ui:
-    profiles: [ "prod" ]
+#    profiles: [ "prod" ]
     image: provectuslabs/kafka-ui:latest
     restart: unless-stopped
     depends_on:

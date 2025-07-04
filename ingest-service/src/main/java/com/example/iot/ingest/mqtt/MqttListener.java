@@ -22,7 +22,7 @@ public class MqttListener implements MqttCallback {
 
     private final MqttConfigProperties props;              // ✔ config bean
     private final SensorDataRepository repo;
-//    private final KafkaTemplate<String, String> kafka;
+    private final KafkaTemplate<String, String> kafka;
 
     private final ObjectMapper mapper;
     private IMqttClient client;                            // warning about “could be local” is harmless
@@ -59,7 +59,7 @@ public class MqttListener implements MqttCallback {
             e.setValue(rec.value());
             repo.save(e);
 
-//            kafka.send("iot.raw", topic, new String(raw.getPayload()));
+            kafka.send("iot.raw", topic, new String(raw.getPayload()));
         } catch (Exception ex) {
             log.error("FAILED to parse {}", new String(raw.getPayload()), ex);
         }
