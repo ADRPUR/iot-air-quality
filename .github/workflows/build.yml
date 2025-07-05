@@ -56,22 +56,42 @@ jobs:
           docker tag  $REGISTRY/$IMAGE_NAME:sha-${GITHUB_SHA::8} \
                       $REGISTRY/$IMAGE_NAME:latest
 
+      # ─── Start PostgreSQL for CI ────────────────────────────────────────
+      - name: Start PostgreSQL
+        run: |
+          docker run -d --name ci-postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=smarthome \
+            -p 5432:5432 \
+            postgres:16
+
+          # wait until Postgres is accepting connections
+          for i in {1..30}; do
+            docker exec ci-postgres pg_isready -U postgres && break
+            sleep 1
+          done
+
       - name: Flyway migrate (alert)
         run: |
-          docker run --rm --network host flyway/flyway:10 \
+          docker run --rm --network host \
+            -v "${{ github.workspace }}/alert-service/src/main/resources/db/migration:/flyway/sql" \
+            flyway/flyway:10 \
             -url=jdbc:postgresql://localhost:5432/smarthome \
             -user=postgres -password=postgres \
             -schemas=alert \
-            -locations=filesystem:alert-service/src/main/resources/db/migration \
+            -locations=filesystem:/flyway/sql \
             migrate
 
       - name: Flyway migrate (ingest)
         run: |
-          docker run --rm --network host flyway/flyway:10 \
+          docker run --rm --network host \
+            -v "${{ github.workspace }}/ingest-service/src/main/resources/db/migration:/flyway/sql" \
+            flyway/flyway:10 \
             -url=jdbc:postgresql://localhost:5432/smarthome \
             -user=postgres -password=postgres \
             -schemas=ingest \
-            -locations=filesystem:ingest-service/src/main/resources/db/migration \
+            -locations=filesystem:/flyway/sql \
             migrate
 
       # ─── 7. login & push to GHCR ──────────────────────────────────────
