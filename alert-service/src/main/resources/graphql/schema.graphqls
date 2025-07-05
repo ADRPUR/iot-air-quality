@@ -1,0 +1,35 @@
+# ————————————————————————————— Types ——————————————————————————————
+
+type AlertLog {
+    id:        ID!
+    ts:        String!    # ISO-8601 timestamp
+    sensorId:  String!
+    field:     String!
+    value:     Float!
+    limit:     Float!
+    channels:  [String!]!
+}
+
+type AlertRule {
+    id:      ID!
+    field:   String!
+    maxVal:  Float!
+    enabled: Boolean!
+}
+
+# ————————————————————————————— Queries ——————————————————————————————
+
+type Query {
+    alertHistory(limit: Int = 50): [AlertLog]
+    alertRules: [AlertRule]
+}
+
+# ————————————————————————————— Mutations ——————————————————————————————
+
+type Mutation {
+    updateRule(
+        id:      ID!
+        maxVal:  Float!
+        enabled: Boolean!
+    ): AlertRule
+}

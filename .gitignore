@@ -20,3 +20,5 @@ __pycache__/
 /infra/mosquitto/acl
 /infra/mosquitto/passwd
 /infra/mosquitto/generated/
+/alert-service/src/main/resources/.env
+/ingest-service/src/main/resources/.env

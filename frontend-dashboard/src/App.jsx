@@ -1,8 +1,12 @@
 import {BrowserRouter as Router, Routes, Route, Navigate, useLocation} from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import { client } from "./apolloClient.js";
+import { ApolloProvider as AlertApolloProvider } from "@apollo/client";
+import { alertClient } from "./alertApolloClient.js";
 import Navbar from "./components/Navbar.jsx";
 import Dashboard from "./routes/Dashboard.jsx";
+import RulesPage from "./routes/RulesPage.jsx";
+import AlertsPage from "./routes/AlertsPage.jsx";
 import Login from "./routes/Login.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
@@ -30,6 +34,26 @@ export default function App() {
                             element={
                                 <PrivateRoute>
                                     <Dashboard />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/alerts"
+                            element={
+                                <PrivateRoute>
+                                    <AlertApolloProvider client={alertClient}>
+                                        <AlertsPage />
+                                    </AlertApolloProvider>
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/rules"
+                            element={
+                                <PrivateRoute>
+                                    <AlertApolloProvider client={alertClient}>
+                                        <RulesPage />
+                                    </AlertApolloProvider>
                                 </PrivateRoute>
                             }
                         />

@@ -1,15 +1,16 @@
+# ————————————————————————————— Types ——————————————————————————————
+
 type Metric {
-    time:      String
-    sensorId:  String
-    field:     String
-    value:     Float
+    time:     String
+    sensorId: String
+    field:    String
+    value:    Float
 }
 
-type Query {
-    # existing:
-    latestMetrics(limit: Int = 20): [Metric]
+# ————————————————————————————— Queries ——————————————————————————————
 
-    # new:
+type Query {
+    latestMetrics(limit: Int = 20): [Metric]
     latestMetricsBySensor(
         sensorId: String!
         field:    String!

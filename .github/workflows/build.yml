@@ -56,6 +56,24 @@ jobs:
           docker tag  $REGISTRY/$IMAGE_NAME:sha-${GITHUB_SHA::8} \
                       $REGISTRY/$IMAGE_NAME:latest
 
+      - name: Flyway migrate (alert)
+        run: |
+          docker run --rm --network host flyway/flyway:10 \
+            -url=jdbc:postgresql://localhost:5432/smarthome \
+            -user=postgres -password=postgres \
+            -schemas=alert \
+            -locations=filesystem:alert-service/src/main/resources/db/migration \
+            migrate
+
+      - name: Flyway migrate (ingest)
+        run: |
+          docker run --rm --network host flyway/flyway:10 \
+            -url=jdbc:postgresql://localhost:5432/smarthome \
+            -user=postgres -password=postgres \
+            -schemas=ingest \
+            -locations=filesystem:ingest-service/src/main/resources/db/migration \
+            migrate
+
       # ─── 7. login & push to GHCR ──────────────────────────────────────
       - uses: docker/login-action@v3
         with:

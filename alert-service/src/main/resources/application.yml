@@ -1,6 +1,20 @@
+server:
+  port: 8081
+
 spring:
+
+  # PostgreSQL / Timescale
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 8
+
+
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: alert-service
       auto-offset-reset: latest
@@ -8,18 +22,40 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
   mail:
-    host: ${SMTP_HOST:smtp.gmail.com}
-    port: ${SMTP_PORT:587}
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
     username: ${SMTP_USER}
     password: ${SMTP_PASS}
     properties.mail.smtp.auth: true
     properties.mail.smtp.starttls.enable: true
 
+  # GraphQL endpoint
+  graphql:
+    path: /graphql
+    websocket:
+      path: /graphql
+
+  # Flyway
+  flyway:
+    schemas: alert
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.hibernate.default_schema: alert
+    open-in-view: false
+
 alert:
   thresholds:
-    # field -> max value
     temperature: 30
     humidity: 80
     pm25: 50
     air_quality: 150
-  email-to: ${ALERT_EMAIL:your@mail.com}
+  email-to: ${ALERT_EMAIL}
+  telegram:
+    token: ${TG_BOT_TOKEN}
+    chat-id: ${TG_CHAT_ID}
