@@ -1,5 +1,20 @@
-1 Instalează și activează TimescaleDB
+# Prerequisites (Ubuntu / PostgreSQL 17.5)
+To use TimescaleDB on PostgreSQL 17.5, install the packaged extension and preload it:
+```bash
+sudo apt update
+sudo apt install timescaledb-2-postgresql-17
+``` 
+Then in your `postgresql.conf`, add:
+```
+shared_preload_libraries = 'timescaledb'
+```
+and restart the server:
+```bash
+sudo systemctl restart postgresql
+```
 
+1 Instalează și activează TimescaleDB
+```sql
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 SELECT extversion FROM pg_extension WHERE extname = 'timescaledb';
 extversion ar trebui ≥ 2.13.
@@ -80,3 +95,4 @@ SELECT remove_continuous_aggregate_policy('sensor_avg_5m');
 DROP MATERIALIZED VIEW IF EXISTS sensor_avg_5m;
 DROP TABLE IF EXISTS sensor_data;
 DROP SCHEMA ingest CASCADE;
+```

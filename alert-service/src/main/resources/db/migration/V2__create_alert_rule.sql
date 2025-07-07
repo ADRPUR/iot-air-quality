@@ -1,4 +1,5 @@
 SET search_path TO alert, public;
+
 CREATE TABLE IF NOT EXISTS alert_rule
 (
     id      SERIAL PRIMARY KEY,
@@ -6,4 +7,3 @@ CREATE TABLE IF NOT EXISTS alert_rule
     max_val DOUBLE PRECISION NOT NULL,
     enabled BOOLEAN DEFAULT true
 );
-
