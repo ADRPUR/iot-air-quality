@@ -1,4 +1,5 @@
 import {useQuery, gql} from "@apollo/client";
+import {alertClient} from "../apolloClient.js";
 
 const ALERT_HISTORY = gql`
     query AlertHistory($limit: Int!) {
@@ -16,6 +17,7 @@ const ALERT_HISTORY = gql`
 
 export default function AlertsPage() {
     const {data, loading, error} = useQuery(ALERT_HISTORY, {
+        client: alertClient,
         variables: {limit: 100},
         pollInterval: 5000,
     });

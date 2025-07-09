@@ -1,19 +1,27 @@
-# ————————————————————————————— Types ——————————————————————————————
+# ──── Types ─────────────────────────────────────────────────────────────
+type Metric  { time: String, sensorId: String, field: String, value: Float }
+type Sensor  { sensorId: String!, name: String, visible: Boolean! }
 
-type Metric {
-    time:     String
-    sensorId: String
-    field:    String
-    value:    Float
-}
-
-# ————————————————————————————— Queries ——————————————————————————————
-
+# ──── Root QUERY ────────────────────────────────────────────────────────
 type Query {
+    # metric queries
     latestMetrics(limit: Int = 20): [Metric]
     latestMetricsBySensor(
+        sensorId: String!, field: String!, limit: Int = 20
+    ): [Metric]
+    metricsInRange(
         sensorId: String!
         field:    String!
-        limit:    Int = 20
-    ): [Metric]
+        from:     String!
+        to:       String
+    ): [Metric!]!
+
+    # sensor list
+    sensors: [Sensor!]!
+}
+
+# ──── Root MUTATION ─────────────────────────────────────────────────────
+type Mutation {
+    setSensorVisibility(sensorId: String!, visible: Boolean!): Sensor!
+    renameSensor        (sensorId: String!, name:    String!): Sensor!
 }

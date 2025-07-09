@@ -32,6 +32,8 @@ spring:
   # GraphQL endpoint
   graphql:
     path: /graphql
+    cors:
+      allowed-origins: "*"
     websocket:
       path: /graphql
 

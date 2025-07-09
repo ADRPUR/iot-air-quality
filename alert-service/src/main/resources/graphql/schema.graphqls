@@ -33,3 +33,9 @@ type Mutation {
         enabled: Boolean!
     ): AlertRule
 }
+
+# ————————————————————————————— Subscription ——————————————————————————————
+
+type Subscription {
+    alertFired: AlertLog!
+}

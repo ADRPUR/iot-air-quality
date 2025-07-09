@@ -1,5 +1,6 @@
 import {useQuery, useMutation, gql} from "@apollo/client";
 import {useState} from "react";
+import { alertClient } from "../apolloClient.js";
 
 // GraphQL
 const GET_RULES = gql`
@@ -14,7 +15,7 @@ const UPDATE_RULE = gql`
 `;
 
 export default function RulesPage() {
-    const {data, loading, error} = useQuery(GET_RULES);
+    const {data, loading, error} = useQuery(GET_RULES, { client: alertClient });
     const [updateRule] = useMutation(UPDATE_RULE, {
         refetchQueries: [{query: GET_RULES}]
     });

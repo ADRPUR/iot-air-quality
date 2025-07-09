@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Sinks;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +25,7 @@ public class AlertEvaluator {
     private final TelegramNotifier telegram;
     private final AlertRuleService alertRuleService;
     private final AlertLogService alertLogService;
+    private final Sinks.Many<AlertLog> alertSink;
 
     @Value("${alert.email-to}")
     private String emailTo;
@@ -90,6 +92,7 @@ public class AlertEvaluator {
         a.setLimit(threshold);
         a.setChannels(new String[]{"telegram", "email"});
         alertLogService.saveAlert(a);
+        alertSink.tryEmitNext(a);
         log.info("Saved alert to history: {}", a);
     }
 }

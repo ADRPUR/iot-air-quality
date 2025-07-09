@@ -45,6 +45,14 @@ export default function Navbar() {
                         >
                             Rules
                         </NavLink>
+                        <NavLink
+                            to="/sensors"
+                            className={({ isActive }) =>
+                                isActive ? "underline" : "hover:underline"
+                            }
+                        >
+                            Sensors
+                        </NavLink>
                     </>
                 )}
             </div>
