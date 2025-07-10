@@ -1,8 +1,8 @@
-// src/routes/Dashboard.jsx
 import { useQuery, gql } from "@apollo/client";
 import { useState, useMemo } from "react";
 import ChartCard         from "../components/ChartCard";
 import DashboardControls from "../components/DashboardControls";
+import { presetToRange } from "../utils/range";
 
 const CHARTS = [
     // DHT22
@@ -28,19 +28,22 @@ const GET_SENSORS = gql`
 `;
 
 export default function Dashboard() {
-    const now = Date.now();
-    const [range, setRange] = useState({
-        fromMs: now - 3_600_000,
-        toMs  : now,
-    });
+    const [range, setRange] = useState(() => presetToRange("1h"));
+
+    const handleRangeChange = (r) => {
+        if (r.preset) {
+            setRange(presetToRange(r.preset));
+        } else {
+            setRange(r);
+        }
+    };
 
     const { data } = useQuery(GET_SENSORS, { pollInterval: 10_000 });
-    const visibleSensors = useMemo(() => {
-        if (!data) return new Set();        // încă nu avem date
-        return new Set(
-            data.sensors.filter(s => s.visible).map(s => s.sensorId)
-        );
-    }, [data]);
+    const visibleSensors = useMemo(
+        () => new Set((data?.sensors ?? []).filter(s => s.visible).map(s => s.sensorId)),
+        [data]
+    );
+
 
     const chartsToShow = CHARTS.filter(c =>
         visibleSensors.size === 0 || visibleSensors.has(c.sensor)
@@ -48,7 +51,7 @@ export default function Dashboard() {
 
     return (
         <>
-            <DashboardControls onChange={setRange} />
+            <DashboardControls onChange={handleRangeChange} />
 
             <div className="p-6 grid gap-6 lg:grid-cols-3 auto-rows-[minmax(0,_1fr)]">
                 {chartsToShow.map(c => (
@@ -58,6 +61,7 @@ export default function Dashboard() {
                         field={c.field}
                         color={c.color}
                         range={range}
+                        visibleSensors={visibleSensors}
                     />
                 ))}
             </div>

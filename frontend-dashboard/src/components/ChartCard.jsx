@@ -31,26 +31,36 @@ export default function ChartCard({
                                       sensorId,
                                       field,
                                       color,
-                                      range
+                                      range,
+                                      visibleSensors = new Set()
                                   }) {
-    const hasRange = !!range?.fromMs && !!range?.toMs;
-    const variables = hasRange
+    if (!visibleSensors.has(sensorId)) return null;
+    /* 1. do we have a “from” instant? (always, after Apply) */
+    const hasFrom = range?.fromMs != null;
+
+    /* 2. build variables → include `to` ONLY for custom-range */
+    const variables = hasFrom
         ? {
             sensor: sensorId,
             field,
             from: new Date(range.fromMs).toISOString(),
-            to: new Date(range.toMs).toISOString(),
+            ...(range?.toMs && {       // add `to` if it exists
+                to: new Date(range.toMs).toISOString(),
+            }),
         }
-        : {};
+        : null;
+
+    /* 3. start polling every 5s once we have a `from` time */
+    const poll = hasFrom ? 5_000 : 0;
 
     const {data, loading, error} = useQuery(METRICS_RANGE, {
         variables,
-        pollInterval: 5_000,
+        pollInterval: poll,
         fetchPolicy: "no-cache",
-        skip: !hasRange,
+        skip: !hasFrom,
     });
 
-    if (!hasRange) return null;
+    if (!hasFrom) return null;
     if (loading) return <p>Loading {field} ...</p>;
     if (error) return <div className="p-4 border rounded text-red-600">
         {field}: server unavailable
