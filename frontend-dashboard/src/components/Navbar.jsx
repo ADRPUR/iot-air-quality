@@ -2,6 +2,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -16,8 +17,13 @@ export default function Navbar() {
         <nav className="bg-gray-800 text-gray-100 p-4 flex items-center justify-between">
             {/* Brand + nav links */}
             <div className="flex items-center space-x-6">
-                <NavLink to="/" className="font-bold text-xl">
-                    Smart Home
+                <NavLink to="/" className="flex items-center space-x-2">
+                    <img
+                        src={logo}
+                        alt="Smart Home logo"
+                        className="h-8 w-8"
+                    />
+                    <span className="font-bold text-xl">Smart&nbsp;Home</span>
                 </NavLink>
                 {user && (
                     <>

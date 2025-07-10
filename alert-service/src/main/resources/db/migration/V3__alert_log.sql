@@ -1,5 +1,3 @@
-SET search_path TO alert, public;
-
 CREATE TABLE IF NOT EXISTS alert_log
 (
     id        UUID NOT NULL DEFAULT gen_random_uuid(),

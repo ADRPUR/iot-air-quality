@@ -1,5 +1,3 @@
-SET search_path TO ingest, public;
-
 SELECT add_continuous_aggregate_policy(
                'sensor_avg_5m',
                start_offset => INTERVAL '2 hours',

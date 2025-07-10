@@ -9,20 +9,23 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
 /* ——— GraphQL (one sensor + field) ——————————————— */
-const METRICS_RANGE = gql`
-    query MetricsRange(
+const AVG_5M = gql`
+    query AvgRange(
         $sensor: String!
         $field:  String!
         $from:   String!
         $to:     String
+        $limit:  Int = 500
     ) {
-        metricsInRange(
+        metricsAvg5m(
             sensorId: $sensor
             field:    $field
             from:     $from
             to:       $to
+            limit:    $limit
         ) {
-            time value
+            bucket     # ISO string
+            avgVal
         }
     }
 `;
@@ -53,7 +56,8 @@ export default function ChartCard({
     /* 3. start polling every 5s once we have a `from` time */
     const poll = hasFrom ? 5_000 : 0;
 
-    const {data, loading, error} = useQuery(METRICS_RANGE, {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const {data, loading, error} = useQuery(AVG_5M, {
         variables,
         pollInterval: poll,
         fetchPolicy: "no-cache",
@@ -66,9 +70,9 @@ export default function ChartCard({
         {field}: server unavailable
     </div>
 
-    const points = data.metricsInRange.map(p => ({
-        timeMs: new Date(p.time).getTime(),
-        value: p.value,
+    const points = data.metricsAvg5m.map(p => ({
+        timeMs: new Date(p.bucket).getTime(),
+        value : p.avgVal,
     }));
 
     return (

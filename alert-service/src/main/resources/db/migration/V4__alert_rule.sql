@@ -1,5 +1,3 @@
-SET search_path TO alert, public;
-
 INSERT INTO alert_rule (field, max_val)
 VALUES ('temperature', 30),
        ('humidity', 80),

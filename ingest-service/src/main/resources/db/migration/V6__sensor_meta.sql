@@ -1,4 +1,3 @@
--- 📦  ingest.sensor_meta  (meta-data per physical sensor)
 CREATE TABLE IF NOT EXISTS sensor_meta
 (
     sensor_id TEXT PRIMARY KEY,

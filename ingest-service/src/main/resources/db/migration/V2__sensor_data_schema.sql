@@ -1,4 +1,3 @@
-SET search_path TO ingest, public;
 CREATE TABLE IF NOT EXISTS sensor_data
 (
     time      TIMESTAMPTZ      NOT NULL,

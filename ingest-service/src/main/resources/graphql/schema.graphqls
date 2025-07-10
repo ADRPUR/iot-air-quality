@@ -1,6 +1,7 @@
 # ──── Types ─────────────────────────────────────────────────────────────
 type Metric  { time: String, sensorId: String, field: String, value: Float }
 type Sensor  { sensorId: String!, name: String, visible: Boolean! }
+type MetricAvg { bucket: String!, sensorId: String!, field: String!, avgVal: Float}
 
 # ──── Root QUERY ────────────────────────────────────────────────────────
 type Query {
@@ -15,6 +16,14 @@ type Query {
         from:     String!
         to:       String
     ): [Metric!]!
+
+    metricsAvg5m(
+        sensorId : String!
+        field    : String!
+        from     : String!
+        to       : String
+        limit    : Int = 500
+    ): [MetricAvg!]!
 
     # sensor list
     sensors: [Sensor!]!
