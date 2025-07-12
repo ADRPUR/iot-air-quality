@@ -27,7 +27,7 @@ const GET_SENSORS = gql`
     query { sensors { sensorId visible } }
 `;
 
-export default function Dashboard() {
+export default function Graphs() {
     const [range, setRange] = useState(() => presetToRange("1h"));
 
     const handleRangeChange = (r) => {

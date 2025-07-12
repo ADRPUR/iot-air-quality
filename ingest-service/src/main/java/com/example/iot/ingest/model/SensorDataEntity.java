@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sensor_data")
+@Table(name = "sensor_data", schema = "ingest")
 @Getter @Setter
 public class SensorDataEntity {
 

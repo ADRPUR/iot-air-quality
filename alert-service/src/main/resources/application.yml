@@ -11,6 +11,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 8
+      connection-init-sql: "SET search_path TO alert, public"
 
 
   kafka:
@@ -48,7 +49,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-      hibernate.hibernate.default_schema: alert
+      hibernate.default_schema: alert
     open-in-view: false
 
 alert:

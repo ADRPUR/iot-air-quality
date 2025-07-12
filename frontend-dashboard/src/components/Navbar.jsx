@@ -1,16 +1,16 @@
 // src/components/Navbar.jsx
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import {NavLink} from "react-router-dom";
+import {useAuth} from "../context/AuthContext";
+import {useNavigate} from "react-router-dom";
 import logo from "../assets/logo.png";
 
 export default function Navbar() {
-    const { user, logout } = useAuth();
+    const {user, logout} = useAuth();
     const navigate = useNavigate();
 
     function handleLogout() {
         logout();
-        navigate("/login", { replace: true });
+        navigate("/login", {replace: true});
     }
 
     return (
@@ -29,15 +29,23 @@ export default function Navbar() {
                     <>
                         <NavLink
                             to="/dashboard"
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive ? "underline" : "hover:underline"
                             }
                         >
                             Dashboard
                         </NavLink>
                         <NavLink
+                            to="/graphs"
+                            className={({isActive}) =>
+                                isActive ? "underline" : "hover:underline"
+                            }
+                        >
+                            Graphs
+                        </NavLink>
+                        <NavLink
                             to="/alerts"
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive ? "underline" : "hover:underline"
                             }
                         >
@@ -45,7 +53,7 @@ export default function Navbar() {
                         </NavLink>
                         <NavLink
                             to="/rules"
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive ? "underline" : "hover:underline"
                             }
                         >
@@ -53,7 +61,7 @@ export default function Navbar() {
                         </NavLink>
                         <NavLink
                             to="/sensors"
-                            className={({ isActive }) =>
+                            className={({isActive}) =>
                                 isActive ? "underline" : "hover:underline"
                             }
                         >

@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION ingest.upsert_sensor_meta()
     LANGUAGE plpgsql AS
 $$
 BEGIN
-    INSERT INTO sensor_meta (sensor_id)
+    INSERT INTO ingest.sensor_meta (sensor_id)
     VALUES (NEW.sensor_id)
     ON CONFLICT DO NOTHING;
     RETURN NEW;

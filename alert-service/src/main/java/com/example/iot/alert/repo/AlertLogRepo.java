@@ -9,6 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AlertLogRepo extends JpaRepository<AlertLog, UUID> {
-    @Query(value = "SELECT * FROM alert_log ORDER BY ts DESC LIMIT :n", nativeQuery = true)
+    @Query(value = "SELECT * FROM alert.alert_log ORDER BY ts DESC LIMIT :n", nativeQuery = true)
     List<AlertLog> findTopN(@Param("n") int n);
 }

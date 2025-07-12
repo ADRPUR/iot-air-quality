@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "alert_rule")
+@Table(name = "alert_rule", schema = "alert")
 @Getter
 @Setter
 @NoArgsConstructor

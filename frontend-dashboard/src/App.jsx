@@ -2,13 +2,14 @@ import {BrowserRouter as Router, Routes, Route, Navigate, useLocation} from "rea
 import {ApolloProvider} from "@apollo/client";
 import {ingestClient, alertClient} from "./apolloClient.js";
 import Navbar from "./components/Navbar.jsx";
-import Dashboard from "./routes/Dashboard.jsx";
+import Graphs from "./routes/Graphs.jsx";
 import RulesPage from "./routes/RulesPage.jsx";
 import AlertsPage from "./routes/AlertsPage.jsx";
 import Login from "./routes/Login.jsx";
 import {AuthProvider, useAuth} from "./context/AuthContext.jsx";
 import Notifications from "./components/Notifications.jsx";
 import SensorsPage from "./routes/SensorsPage.jsx";
+import RealtimeDashboard from "./routes/RealtimeDashboard.jsx";
 
 function PrivateRoute({children}) {
     const {user} = useAuth();
@@ -35,7 +36,12 @@ export default function App() {
                         {/* protected route */}
                         <Route path="/dashboard" element={
                             <PrivateRoute>
-                                <Dashboard/>
+                                <RealtimeDashboard/>
+                            </PrivateRoute>
+                        }/>
+                        <Route path="/graphs" element={
+                            <PrivateRoute>
+                                <Graphs/>
                             </PrivateRoute>
                         }/>
                         <Route path="/alerts" element={

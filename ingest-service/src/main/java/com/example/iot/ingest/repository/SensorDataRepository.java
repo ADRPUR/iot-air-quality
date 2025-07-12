@@ -1,6 +1,8 @@
 package com.example.iot.ingest.repository;
 
+import com.example.iot.ingest.dto.SensorValueDto;
 import com.example.iot.ingest.model.SensorDataEntity;
+import com.example.iot.ingest.projection.SensorValueProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -48,4 +50,16 @@ public interface SensorDataRepository
             String field,
             Instant from,
             Instant to);
+
+    @Query(value = """
+            SELECT DISTINCT ON (sensor_id, field)
+                   sensor_id        AS sensorId,
+                   field,
+                   value,
+                   time             AS ts
+            FROM   ingest.sensor_data
+            ORDER  BY sensor_id, field, time DESC
+            """,
+            nativeQuery = true)
+    List<SensorValueProjection> findLatestPerSensorField();
 }

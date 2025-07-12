@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS sensor_data
+CREATE TABLE IF NOT EXISTS ingest.sensor_data
 (
     time      TIMESTAMPTZ      NOT NULL,
     sensor_id TEXT             NOT NULL,

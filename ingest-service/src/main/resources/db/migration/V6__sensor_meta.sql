@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sensor_meta
 );
 
 -- populate with distinct ids already seen în sensor_data
-INSERT INTO sensor_meta (sensor_id)
+INSERT INTO ingest.sensor_meta (sensor_id)
 SELECT DISTINCT sensor_id
 FROM ingest.sensor_data
 ON CONFLICT DO NOTHING;

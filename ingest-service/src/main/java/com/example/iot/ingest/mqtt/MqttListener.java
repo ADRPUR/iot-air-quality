@@ -1,5 +1,7 @@
 package com.example.iot.ingest.mqtt;
 
+import com.example.iot.ingest.dto.SensorValueDto;
+import com.example.iot.ingest.events.SensorValuePublisher;
 import com.example.iot.ingest.model.SensorDataEntity;
 import com.example.iot.ingest.model.SensorRecord;
 import com.example.iot.ingest.repository.SensorDataRepository;
@@ -14,6 +16,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
 
 @Slf4j
 @Component
@@ -23,6 +26,7 @@ public class MqttListener implements MqttCallback {
     private final MqttConfigProperties props;              // ✔ config bean
     private final SensorDataRepository repo;
     private final KafkaTemplate<String, String> kafka;
+    private final SensorValuePublisher publisher;
 
     private final ObjectMapper mapper;
     private IMqttClient client;                            // warning about “could be local” is harmless
@@ -57,9 +61,16 @@ public class MqttListener implements MqttCallback {
             e.setSensorId(rec.sensor());
             e.setField(rec.field());
             e.setValue(rec.value());
-            repo.save(e);
+            SensorDataEntity saved = repo.save(e);
 
             kafka.send("iot.raw", topic, new String(raw.getPayload()));
+            publisher.publish(new SensorValueDto(
+                    saved.getSensorId(),
+                    saved.getField(),
+                    saved.getValue(),
+                    saved.getTime()
+                            .atOffset(ZoneOffset.UTC)
+            ));
         } catch (Exception ex) {
             log.error("FAILED to parse {}", new String(raw.getPayload()), ex);
         }

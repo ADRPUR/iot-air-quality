@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "alert_log")
+@Table(name = "alert_log", schema = "alert")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

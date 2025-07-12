@@ -1,7 +1,16 @@
+scalar Timestamp
+
 # ──── Types ─────────────────────────────────────────────────────────────
 type Metric  { time: String, sensorId: String, field: String, value: Float }
 type Sensor  { sensorId: String!, name: String, visible: Boolean! }
-type MetricAvg { bucket: String!, sensorId: String!, field: String!, avgVal: Float}
+type MetricAvg { bucket: String!, sensorId: String!, field: String!, avgVal: Float }
+type MetricAvgUpdate { sensorId: String!, field: String! }
+type SensorValue {
+    sensorId: String!
+    field:    String!
+    value:    Float!
+    ts:       Timestamp!
+}
 
 # ──── Root QUERY ────────────────────────────────────────────────────────
 type Query {
@@ -25,6 +34,8 @@ type Query {
         limit    : Int = 500
     ): [MetricAvg!]!
 
+    currentValues: [SensorValue!]!
+
     # sensor list
     sensors: [Sensor!]!
 }
@@ -33,4 +44,10 @@ type Query {
 type Mutation {
     setSensorVisibility(sensorId: String!, visible: Boolean!): Sensor!
     renameSensor        (sensorId: String!, name:    String!): Sensor!
+}
+
+# ──── Root SUBSCRIPTION ──────────────────────────────────────────────────
+type Subscription {
+    avg5mUpdated : MetricAvgUpdate!
+    sensorValueUpdated(sensorId: String, field: String): SensorValue!
 }
