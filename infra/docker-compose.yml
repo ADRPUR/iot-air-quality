@@ -54,7 +54,7 @@ services:
 
   # ---------------- Kafka UI ----------------
   kafka-ui:
-#    profiles: [ "prod" ]
+    profiles: [ "prod" ]
     image: provectuslabs/kafka-ui:latest
     restart: unless-stopped
     depends_on:

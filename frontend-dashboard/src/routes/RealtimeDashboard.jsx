@@ -16,10 +16,13 @@ const LIVE = gql`
 const keyOf = v => `${v.sensorId}-${v.field}`;
 
 const fieldMeta = {
-    temperature: { icon: Thermometer, ring: "ring-red-400", unit: "°C" },
-    humidity:    { icon: Droplets,    ring: "ring-sky-400", unit: "%"  },
+    temperature: { icon: Thermometer, ring: "ring-gray-400", unit: "°C" },
+    humidity:    { icon: Droplets,    ring: "ring-gray-400", unit: "%"  },
     pressure:    { icon: Cloud,       ring: "ring-gray-400", unit: "hPa" },
-    light:       { icon: Sun,         ring: "ring-amber-400", unit: "lux" },
+    pm1:         { icon: Sun,         ring: "ring-gray-400", unit: "μg/m³" },
+    pm25:         { icon: Sun,         ring: "ring-gray-400", unit: "μg/m³" },
+    pm10:         { icon: Sun,         ring: "ring-gray-400", unit: "μg/m³" },
+    air_quality:   { icon: Sun,         ring: "ring-gray-400", unit: "ppm" },
 };
 
 function formatField(f) {
@@ -28,7 +31,7 @@ function formatField(f) {
 
 /* ───────────── Page ───────────── */
 export default function RealtimeDashboard() {
-    const { data }  = useQuery(SNAPSHOT, { fetchPolicy: "network-only" });
+    const { data, loading, error }  = useQuery(SNAPSHOT, { fetchPolicy: "network-only" });
     const [map, setMap] = useState(new Map());
 
     /* populate snapshot */
@@ -53,6 +56,12 @@ export default function RealtimeDashboard() {
     return (
         <div className="p-6">
             <h1 className="text-2xl font-semibold text-center mb-6">Live Sensors</h1>
+
+            {error && (
+                <div className="text-red-600 text-lg mt-8">
+                    Server unavailable
+                </div>
+            )}
 
             {/* centered grid */}
             <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center mx-auto">

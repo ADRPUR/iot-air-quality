@@ -85,7 +85,7 @@ export default function ChartCard({
 
     if (!visibleSensors.has(sensorId) || !hasFrom) return null;
 
-    if (loading) return <p>Loading {field}…</p>;
+    if (loading) return <p>Loading {field} ...</p>;
     if (error) return <div className="p-4 border rounded text-red-600">
         {field}: server unavailable
     </div>;

@@ -21,8 +21,8 @@ export default function AlertsPage() {
         variables: {limit: 100},
         pollInterval: 5000,
     });
-    if (loading) return <p>Loading alerts…</p>;
-    if (error) return <p>Error loading alerts</p>;
+    if (loading) return <p className="p-4 text-gray-500">Loading alerts ...</p>;
+    if (error) return <p className="p-4 text-red-600">Error loading alerts</p>;
 
     return (
         <div className="p-6">

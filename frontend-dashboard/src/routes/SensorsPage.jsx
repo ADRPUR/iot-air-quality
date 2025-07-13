@@ -26,8 +26,8 @@ export default function SensorsPage() {
     const [toggle] = useMutation(TOGGLE, { refetchQueries: [GET_SENSORS] });
     const [rename] = useMutation(RENAME, { refetchQueries: [GET_SENSORS] });
 
-    if (loading) return <p>Loading sensors…</p>;
-    if (error)   return <p className="text-red-600">Backend unavailable</p>;
+    if (loading) return <p className="p-4 text-gray-500">Loading sensors ...</p>;
+    if (error) return <p className="p-4 text-red-600">Error loading sensors</p>;
 
     return (
         <div className="p-6 max-w-xl mx-auto space-y-3">

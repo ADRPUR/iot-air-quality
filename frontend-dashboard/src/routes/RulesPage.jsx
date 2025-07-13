@@ -20,7 +20,7 @@ export default function RulesPage() {
         refetchQueries: [{query: GET_RULES}]
     });
 
-    if (loading) return <p className="p-4 text-gray-500">Loading rules…</p>;
+    if (loading) return <p className="p-4 text-gray-500">Loading rules ...</p>;
     if (error) return <p className="p-4 text-red-600">Error loading rules</p>;
 
     return (
