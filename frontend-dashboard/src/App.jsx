@@ -1,15 +1,16 @@
 import {BrowserRouter as Router, Routes, Route, Navigate, useLocation} from "react-router-dom";
 import {ApolloProvider} from "@apollo/client";
-import {ingestClient, alertClient} from "./apolloClient.js";
-import Navbar from "./components/Navbar.jsx";
-import Graphs from "./routes/Graphs.jsx";
-import RulesPage from "./routes/RulesPage.jsx";
-import AlertsPage from "./routes/AlertsPage.jsx";
-import Login from "./routes/Login.jsx";
-import {AuthProvider, useAuth} from "./context/AuthContext.jsx";
-import Notifications from "./components/Notifications.jsx";
-import SensorsPage from "./routes/SensorsPage.jsx";
-import RealtimeDashboard from "./routes/RealtimeDashboard.jsx";
+import {alertClient} from "@/api/clients.js";
+import Navbar from "@/components/layout/Navbar.jsx";
+import Graphs from "@/pages/Graphs.jsx";
+import RulesPage from "@/pages/RulesPage.jsx";
+import AlertsPage from "@/pages/AlertsPage.jsx";
+import Login from "@/pages/auth/Login.jsx";
+import {AuthProvider} from "@/context/AuthContext.jsx";
+import useAuth from "@/hooks/useAuth.js";
+import Notifications from "@/components/Notifications.jsx";
+import SensorsPage from "@/pages/SensorsPage.jsx";
+import RealtimeDashboard from "@/pages/RealtimeDashboard.jsx";
 
 function PrivateRoute({children}) {
     const {user} = useAuth();
@@ -22,51 +23,53 @@ function PrivateRoute({children}) {
 
 export default function App() {
     return (
-        <ApolloProvider client={ingestClient}>
-            <AuthProvider>
-                <Router>
-                    <Navbar/>
-                    <ApolloProvider client={alertClient}>
-                        <Notifications/>
-                    </ApolloProvider>
-                    <Routes>
-                        {/* redirect root to dashboard */}
-                        <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
+        <AuthProvider>
+            <Router>
+                <Navbar/>
+                <ApolloProvider client={alertClient}>
+                    <Notifications/>
+                </ApolloProvider>
+                <Routes>
+                    {/* redirect root to dashboard */}
+                    <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
 
-                        {/* protected route */}
-                        <Route path="/dashboard" element={
-                            <PrivateRoute>
-                                <RealtimeDashboard/>
-                            </PrivateRoute>
-                        }/>
-                        <Route path="/graphs" element={
-                            <PrivateRoute>
-                                <Graphs/>
-                            </PrivateRoute>
-                        }/>
-                        <Route path="/alerts" element={
-                            <PrivateRoute>
+                    {/* protected route */}
+                    <Route path="/dashboard" element={
+                        <PrivateRoute>
+                            <RealtimeDashboard/>
+                        </PrivateRoute>
+                    }/>
+                    <Route path="/graphs" element={
+                        <PrivateRoute>
+                            <Graphs/>
+                        </PrivateRoute>
+                    }/>
+                    <Route path="/alerts" element={
+                        <PrivateRoute>
+                            <ApolloProvider client={alertClient}>
                                 <AlertsPage/>
-                            </PrivateRoute>
-                        }/>
-                        <Route path="/rules" element={
-                            <PrivateRoute>
+                            </ApolloProvider>
+                        </PrivateRoute>
+                    }/>
+                    <Route path="/rules" element={
+                        <PrivateRoute>
+                            <ApolloProvider client={alertClient}>
                                 <RulesPage/>
-                            </PrivateRoute>
-                        }/>
+                            </ApolloProvider>
+                        </PrivateRoute>
+                    }/>
 
-                        <Route path="/sensors" element={
-                            <PrivateRoute>
-                                <SensorsPage/>
-                            </PrivateRoute>
-                        }/>
+                    <Route path="/sensors" element={
+                        <PrivateRoute>
+                            <SensorsPage/>
+                        </PrivateRoute>
+                    }/>
 
-                        <Route path="/login" element={<Login/>}/>
-                        {/* fallback 404 */}
-                        <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
-                    </Routes>
-                </Router>
-            </AuthProvider>
-        </ApolloProvider>
+                    <Route path="/login" element={<Login/>}/>
+                    {/* fallback 404 */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
+                </Routes>
+            </Router>
+        </AuthProvider>
     );
 }

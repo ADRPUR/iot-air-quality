@@ -34,7 +34,10 @@ spring:
   graphql:
     path: /graphql
     cors:
-      allowed-origins: "*"
+      allowed-origins: "http://localhost:5173"
+      allowed-methods: "GET,POST"
+      allowed-headers: "*"
+      allow-credentials: true
     websocket:
       path: /graphql
 
