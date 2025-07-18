@@ -1,41 +1,142 @@
-# ————————————————————————————— Types ——————————————————————————————
+# ========================= Scalars & Enums ===============================
 
+scalar Timestamp      # ISO-8601, UTC
+scalar UUID           # java.util.UUID
+
+"""
+The operator applied to the threshold of a rule.
+
+* **LT**   <    (strict)
+* **LTE**  ≤    (including)
+* **EQ**   =    (equality)
+* **GTE**  ≥    (including)
+* **GT**   >    (strict)
+* **CHANGE** triggers on any value change
+"""
+enum Operator {
+    LT
+    LTE
+    EQ
+    GTE
+    GT
+    CHANGE
+}
+
+"""
+The severity level of an alert.
+"""
+enum AlertLevel {
+    INFO
+    WARN
+    CRITICAL
+}
+
+# ========================= Object Types ==================================
+
+"""
+An alert saved in the log.
+"""
 type AlertLog {
-    id:        ID!
-    ts:        String!    # ISO-8601 timestamp
-    sensorId:  String!
-    field:     String!
-    value:     Float!
-    limit:     Float!
-    channels:  [String!]!
+    id        : ID!
+    created   : Timestamp!
+    sensorId  : String!
+    field     : String!
+    ruleCode  : String!
+    level     : AlertLevel!
+    message   : String!
+    ack       : Boolean!
+    ackTime   : Timestamp
 }
 
+"""
+User-defined rule that decides when an alert is issued.
+"""
 type AlertRule {
-    id:      ID!
-    field:   String!
-    maxVal:  Float!
-    enabled: Boolean!
+    id        : UUID!
+    sensorId  : String!
+    field     : String!
+    op        : Operator!
+    level     : AlertLevel!
+    threshold : Float!
+    enabled   : Boolean!
+    created   : Timestamp!
+    updated   : Timestamp!
 }
 
-# ————————————————————————————— Queries ——————————————————————————————
+# ========================= Root Operations ===============================
 
 type Query {
-    alertHistory(limit: Int = 50): [AlertLog]
-    alertRules: [AlertRule]
+    """
+    Search the alert log (with optional filters).
+    """
+    alertLogs(
+        sensorId : String
+        field    : String
+        ack      : Boolean
+        from     : String   # ISO-8601 UTC, including
+        to       : String   # ISO-8601 UTC, including
+        limit    : Int = 100
+    ): [AlertLog!]!
+
+    """
+    List the rules (you can filter by sensor/field/enabled).
+    """
+    alertRules(
+        sensorId : String
+        field    : String
+        enabled  : Boolean
+    ): [AlertRule!]!
 }
 
-# ————————————————————————————— Mutations ——————————————————————————————
+# ------------------------- Mutations -------------------------------------
 
 type Mutation {
+    # ---- Rule CRUD --------------------------------------------------------
+
+    """
+    Create a new rule.
+    """
+    createRule(
+        sensorId  : String!
+        field     : String!
+        op        : Operator!
+        level     : AlertLevel!
+        threshold : Float!
+        enabled   : Boolean = true
+    ): AlertRule!
+
+    """
+    Updates an existing rule (provided fields only).
+    """
     updateRule(
-        id:      ID!
-        maxVal:  Float!
-        enabled: Boolean!
-    ): AlertRule
+        id        : UUID!
+        op        : Operator
+        level     : AlertLevel
+        threshold : Float
+        enabled   : Boolean
+    ): AlertRule!
+
+    """
+    Permanently delete a rule.
+    """
+    deleteRule(id: UUID!): Boolean!
+
+    # ---- Actions on alerts ------------------------------------------------
+
+    """
+    Mark an alert as (un)acknowledge.
+    """
+    acknowledgeAlert(id: ID!): AlertLog!
 }
 
-# ————————————————————————————— Subscription ——————————————————————————————
+# ------------------------- Subscriptions ---------------------------------
 
 type Subscription {
-    alertFired: AlertLog!
+    """
+    Live feed with newly generated alerts.
+    """
+    alertTriggered(
+        sensorId : String
+        field    : String
+    ): AlertLog!
 }

@@ -1,71 +1,44 @@
 /* ------------------------------------------------------
    pages/Graphs.jsx – historical charts per sensor/field
 ------------------------------------------------------ */
-import { useQuery, gql } from "@apollo/client";
-import { useState, useMemo } from "react";
-import ChartCard from "@/components/charts/ChartCard.jsx";
+import { useState } from "react";
+
 import DashboardControls from "@/components/DashboardControls.jsx";
-import StatusState from "@/components/common/StatusState.jsx";
+import ChartCard         from "@/components/charts/ChartCard.jsx";
 import { presetToRange } from "@/utils/range.js";
 
-/* sensors visibility (updated every 10 s) */
-const GET_SENSORS = gql`
-    query { sensors { sensorId visible } }
-`;
-
-/* list of charts shown */
+/* ---- ce grafice afișăm ------------------------------- */
 const CHARTS = [
-    // DHT22
-    { sensor: "dht22_1", field: "temperature", color: "#f97316" },
-    { sensor: "dht22_1", field: "humidity",    color: "#0ea5e9" },
-    // BME280
+    { sensor: "dht22_1",  field: "temperature", color: "#f97316" },
+    { sensor: "dht22_1",  field: "humidity",    color: "#0ea5e9" },
     { sensor: "bme280_1", field: "temperature", color: "#84cc16" },
     { sensor: "bme280_1", field: "humidity",    color: "#22c55e" },
     { sensor: "bme280_1", field: "pressure",    color: "#a855f7" },
-    // MQ135
     { sensor: "mq135_1",  field: "air_quality", color: "#ef4444" },
-    // PMS5003
     { sensor: "pms5003_1", field: "pm1",  color: "#BA487F" },
     { sensor: "pms5003_1", field: "pm25", color: "#FF9587" },
     { sensor: "pms5003_1", field: "pm10", color: "#03A6A1" },
 ];
 
-export default function Graphs() {
-    /* range = { preset:"1h" | "6h" | "24h" | "custom", fromMs, toMs } */
+export default function GraphsPage() {
     const [range, setRange] = useState(() => presetToRange("1h"));
-
-    const handleRangeChange = (r) => {
-        if (r.preset) setRange(presetToRange(r.preset, r));
-        else          setRange(r);
-    };
-
-    /* sensors visibility */
-    const { data, loading, error } = useQuery(GET_SENSORS, { pollInterval: 10_000 });
-    const visibleSensors = useMemo(() =>
-            new Set((data?.sensors ?? []).filter(s => s.visible).map(s => s.sensorId)),
-        [data]
-    );
-
-    const chartsToShow = CHARTS.filter(c =>
-        visibleSensors.size === 0 || visibleSensors.has(c.sensor)
-    );
 
     return (
         <>
-            <DashboardControls onChange={handleRangeChange} />
-
-            {error && <StatusState type="error" text="Server unavailable"/>}
-            {loading && !data && <StatusState type="loading" text="Loading sensors…"/>}
+            <DashboardControls
+                onChange={(r) =>
+                    setRange(r.preset ? presetToRange(r.preset, r) : r)
+                }
+            />
 
             <div className="p-6 grid gap-6 lg:grid-cols-3 auto-rows-[minmax(0,_1fr)]">
-                {chartsToShow.map(c => (
+                {CHARTS.map((c) => (
                     <ChartCard
                         key={`${c.sensor}-${c.field}`}
                         sensorId={c.sensor}
                         field={c.field}
                         color={c.color}
-                        range={range}
-                        visibleSensors={visibleSensors}
+                        range={range}   // { fromMs, toMs }
                     />
                 ))}
             </div>

@@ -1,5 +1,10 @@
 # ───────────────────────────────────────── Spring ────────────────────────────────────────
 spring:
+  profiles:
+    active: dev
+  application:
+    name: ingest-service
+
 
   # PostgreSQL / Timescale
   datasource:
@@ -29,11 +34,6 @@ spring:
   # GraphQL endpoint
   graphql:
     path: /graphql
-    cors:
-        allowed-origins: "http://localhost:5173"
-        allowed-methods: "GET,POST"
-        allowed-headers: "*"
-        allow-credentials: true
     websocket:
         path: /graphql
 
@@ -48,9 +48,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, prometheus        # /actuator/health, /actuator/prometheus
-  endpoint:
-    prometheus.enabled: true
+        include: health, info, prometheus        # /actuator/health, /actuator/prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        mqtt.message.process: true
+        db.sensor_data.save: true
   # if you want a separate port for Prometheus:
   # server.port: 9090
   prometheus:
@@ -72,5 +75,10 @@ mqtt:
   topic:    sensors/#
   username: ${MQTT_USER}
   password: ${MQTT_PASS}
+
+# ───────────────────────────────────────── Kafka ─────────────────────────────────────────
+ingest:
+  kafka:
+    topic-raw: iot.raw
 
 

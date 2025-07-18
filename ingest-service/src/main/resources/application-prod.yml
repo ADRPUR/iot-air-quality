@@ -1,0 +1,7 @@
+spring:
+  graphql:
+    cors:
+      allowed-origins: "https://dashboard.example.com"
+      allowed-methods: "GET,POST"
+      allowed-headers: "*"
+      allow-credentials: true

@@ -1,65 +1,51 @@
 package com.example.iot.ingest.repository;
 
-import com.example.iot.ingest.dto.SensorValueDto;
 import com.example.iot.ingest.model.SensorDataEntity;
 import com.example.iot.ingest.projection.SensorValueProjection;
+import io.micrometer.core.annotation.Timed;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface SensorDataRepository
-        extends JpaRepository<SensorDataEntity, UUID> {
+/**
+ * ARead-only access to raw data from ingest.sensor_data + current view.
+ * We use {@link Pageable} (PageRequest.of(0, n)) instead of LIMIT ➜
+ * dialect-independent (PostgreSQL, H2, Oracle).
+ */
+public interface SensorDataRepository extends JpaRepository<SensorDataEntity, UUID> {
 
-    /**
-     * Returns the latest N rows by timestamp (desc).
-     */
-    @Query("""
-            SELECT e
-            FROM   SensorDataEntity e
-            ORDER  BY e.time DESC
-            LIMIT  :limit
-            """)
-    List<SensorDataEntity> findLatest(@Param("limit") int limit);
+    /* ---------- newest N global rows ---------- */
+    Page<SensorDataEntity> findAllByOrderByTimeDesc(Pageable pageable);
 
+    /* ---------- newest N rows for (sensor, field) ---------- */
+    Page<SensorDataEntity> findBySensorIdAndFieldOrderByTimeDesc(
+            String  sensorId,
+            String  field,
+            Pageable pageable);
 
-    @Query("""
-            SELECT e FROM SensorDataEntity e
-            WHERE  e.sensorId = :sensor
-            AND    e.field     = :field
-            ORDER  BY e.time DESC
-            LIMIT  :limit
-            """)
-    List<SensorDataEntity> findLatestBySensor(
-            @Param("sensor") String sensorId,
-            @Param("field") String field,
-            @Param("limit") int limit);
-
-    @Query("""
-               SELECT m FROM SensorDataEntity m
-               WHERE m.sensorId = :sensor
-                 AND m.field     = :field
-                 AND m.time BETWEEN :from AND :to
-               ORDER BY m.time DESC
-            """)
-    List<SensorDataEntity> findBySensorFieldAndTimeBetween(
-            String sensor,
-            String field,
+    /* ---------- interval [from, to] for (sensor, field) ---------- */
+    Page<SensorDataEntity> findBySensorIdAndFieldAndTimeBetweenOrderByTimeDesc(
+            String  sensorId,
+            String  field,
             Instant from,
-            Instant to);
+            Instant to,
+            Pageable pageable);
 
+    /* ---------- projection from materialized view current_values ---------- */
     @Query(value = """
-            SELECT DISTINCT ON (sensor_id, field)
-                   sensor_id        AS sensorId,
+            SELECT sensor_id AS sensorId,
                    field,
                    value,
-                   time             AS ts
-            FROM   ingest.sensor_data
-            ORDER  BY sensor_id, field, time DESC
-            """,
-            nativeQuery = true)
-    List<SensorValueProjection> findLatestPerSensorField();
+                   ts
+            FROM ingest.current_values
+            """, nativeQuery = true)
+    List<SensorValueProjection> findAllCurrent();
+
 }

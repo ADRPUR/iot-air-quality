@@ -29,7 +29,7 @@ export default function Navbar() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
                 {/* Logo & mobile menu button */}
                 <div className="flex items-center gap-2">
-                    <img src={logo} alt="logo" className="h-16 w-auto"/>
+                    <img src={logo} alt="logo" className="h-16 w-auto py-2"/>
                     <button className="sm:hidden p-2" onClick={toggle}>
                         <Menu className="w-5 h-5 text-gray-600"/>
                     </button>

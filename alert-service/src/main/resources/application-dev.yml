@@ -1,0 +1,13 @@
+spring:
+  graphql:
+    cors:
+      allowed-origins: "http://localhost:5173"
+      allowed-methods: "GET,POST"
+      allowed-headers: "*"
+      allow-credentials: true
+
+alert:
+  email:
+    from: "${MAIL_FROM:no-reply@iot.local}"
+    to:   "${MAIL_TO:admin@iot.local}"
+    enabled: false

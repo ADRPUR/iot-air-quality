@@ -10,7 +10,7 @@ export default function RealtimeDashboard() {
 
     /* UI states */
     if (loading && values.length === 0)
-        return <StatusState type="loading" text="Loading sensors…" />;
+        return <StatusState type="loading" text="Loading sensors ..." />;
     if (error)
         return <StatusState type="error" text="Server unavailable" />;
     if (values.length === 0)

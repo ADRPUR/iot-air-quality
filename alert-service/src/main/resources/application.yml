@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    active: dev
 
   # PostgreSQL / Timescale
   datasource:
@@ -16,11 +18,6 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-    consumer:
-      group-id: alert-service
-      auto-offset-reset: latest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
   mail:
     host: ${SMTP_HOST}
@@ -33,11 +30,6 @@ spring:
   # GraphQL endpoint
   graphql:
     path: /graphql
-    cors:
-      allowed-origins: "http://localhost:5173"
-      allowed-methods: "GET,POST"
-      allowed-headers: "*"
-      allow-credentials: true
     websocket:
       path: /graphql
 
@@ -56,12 +48,9 @@ spring:
     open-in-view: false
 
 alert:
-  thresholds:
-    temperature: 30
-    humidity: 80
-    pm25: 50
-    air_quality: 150
-  email-to: ${ALERT_EMAIL}
+  kafka:
+    group-id: alert-service
+    topic-raw: iot.raw
   telegram:
     token: ${TG_BOT_TOKEN}
     chat-id: ${TG_CHAT_ID}

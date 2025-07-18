@@ -1,7 +1,6 @@
 package com.example.iot.ingest.config;
 
-import graphql.scalars.ExtendedScalars;
-import graphql.schema.GraphQLScalarType;
+import com.example.iot.ingest.scalar.TimestampScalar;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
@@ -10,12 +9,7 @@ import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 public class GraphQlScalarConfig {
 
     @Bean
-    RuntimeWiringConfigurer timestampScalar() {
-        GraphQLScalarType timestamp = GraphQLScalarType
-                .newScalar(ExtendedScalars.DateTime)
-                .name("Timestamp")
-                .description("ISO-8601 instant in UTC")
-                .build();
-        return wiring -> wiring.scalar(timestamp);
+    RuntimeWiringConfigurer timestampScalarConfigurer() {
+        return wiring -> wiring.scalar(TimestampScalar.INSTANCE);
     }
 }

@@ -1,9 +1,6 @@
 package com.example.iot.ingest.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 
@@ -12,14 +9,21 @@ import java.time.Instant;
 @Entity
 @Table(name = "sensor_avg_5m", schema = "ingest")
 @Immutable
+@IdClass(MetricAvgKey.class)
 @Getter
+@Cacheable
 public class MetricAvgEntity {
 
     @Id
     @Column(name = "bucket")
     private Instant bucket;
 
+    @Id
+    @Column(nullable = false)
     private String sensorId;
+
+    @Id
+    @Column(nullable = false)
     private String field;
 
     @Column(name = "avg_val")

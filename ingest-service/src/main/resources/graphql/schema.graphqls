@@ -1,15 +1,39 @@
 scalar Timestamp
 
 # ──── Types ─────────────────────────────────────────────────────────────
-type Metric  { time: String, sensorId: String, field: String, value: Float }
-type Sensor  { sensorId: String!, name: String, visible: Boolean! }
-type MetricAvg { bucket: String!, sensorId: String!, field: String!, avgVal: Float }
-type MetricAvgUpdate { sensorId: String!, field: String! }
+type Metric  {
+    time:     String
+    sensorId: String
+    field:    String
+    value:    Float
+}
+
+type Sensor  {
+    sensorId: String!
+    name:     String
+    visible:  Boolean!
+}
+
+type MetricAvg {
+    bucket:   Timestamp!
+    sensorId: String!
+    field:    String!
+    avgVal:   Float
+    sensor:   Sensor!
+}
+
+type MetricAvgUpdate {
+    sensorId: String!
+    field:    String!
+    sensor:   Sensor!
+}
+
 type SensorValue {
     sensorId: String!
     field:    String!
     value:    Float!
     ts:       Timestamp!
+    sensor:   Sensor!
 }
 
 # ──── Root QUERY ────────────────────────────────────────────────────────
@@ -24,30 +48,31 @@ type Query {
         field:    String!
         from:     String!
         to:       String
+        limit:    Int
     ): [Metric!]!
 
     metricsAvg5m(
-        sensorId : String!
-        field    : String!
-        from     : String!
-        to       : String
-        limit    : Int = 500
+        sensorId: String!
+        field:    String!
+        from:     String!
+        to:       String
+        limit:    Int = 500
     ): [MetricAvg!]!
 
     currentValues: [SensorValue!]!
-
-    # sensor list
-    sensors: [Sensor!]!
+    sensors:       [Sensor!]!
 }
 
 # ──── Root MUTATION ─────────────────────────────────────────────────────
 type Mutation {
     setSensorVisibility(sensorId: String!, visible: Boolean!): Sensor!
-    renameSensor        (sensorId: String!, name:    String!): Sensor!
+    renameSensor       (sensorId: String!, name: String!):   Sensor!
 }
 
 # ──── Root SUBSCRIPTION ──────────────────────────────────────────────────
 type Subscription {
-    avg5mUpdated : MetricAvgUpdate!
-    sensorValueUpdated(sensorId: String, field: String): SensorValue!
+    avg5mUpdated(sensorId: String!, field: String!): MetricAvgUpdate!
+    sensorValueUpdated(
+        sensorId: String, field: String
+    ): SensorValue!
 }

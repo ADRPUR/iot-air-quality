@@ -10,6 +10,11 @@ export const CURRENT_VALUES = gql`
             field
             value
             ts
+            sensor {
+                sensorId
+                name
+                visible
+            }
         }
     }
 `;
@@ -22,6 +27,11 @@ export const SENSOR_VALUE_UPDATED = gql`
             field
             value
             ts
+            sensor {
+                sensorId
+                name
+                visible
+            }
         }
     }
 `;
@@ -31,14 +41,14 @@ export const SENSOR_VALUE_UPDATED = gql`
 /** Range of 5-minute buckets between from..to (max 500 points) */
 export const AVG_RANGE = gql`
     query AvgRange(
-        $sensor: String!
-        $field: String!
-        $from:  String!
-        $to:    String
-        $limit: Int = 500
+        $sensorId: String!
+        $field:   String!
+        $from:    String!
+        $to:      String
+        $limit:   Int = 500
     ) {
         metricsAvg5m(
-            sensorId: $sensor
+            sensorId: $sensorId
             field:    $field
             from:     $from
             to:       $to
@@ -46,14 +56,15 @@ export const AVG_RANGE = gql`
         ) {
             bucket
             avgVal
+            sensor { sensorId name visible }
         }
     }
 `;
 
 /** Notification that the aggregate has been recalculated (1×/min) */
 export const AVG_UPDATED = gql`
-    subscription OnAvgUpdated {
-        avg5mUpdated {
+    subscription OnAvgUpdated($sensorId: String!, $field: String!) {
+        avg5mUpdated(sensorId: $sensorId, field: $field) {
             sensorId
             field
         }

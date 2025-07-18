@@ -18,6 +18,7 @@ public class SensorMeta {
     private String sensorId;
 
     private String name;
+
     @Column(nullable = false)
     private boolean visible = true;
 }
