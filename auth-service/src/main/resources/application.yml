@@ -1,0 +1,44 @@
+server:
+  port: 8083
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-ttl: 1800
+  refresh-ttl: 7d
+  issuer: iot-auth
+
+spring:
+  profiles:
+    active: dev
+
+  # PostgreSQL / Timescale
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 8
+      connection-init-sql: "SET search_path TO auth, public"
+
+
+  # GraphQL endpoint
+  graphql:
+    path: /graphql
+    websocket:
+      path: /graphql
+
+  # Flyway
+  flyway:
+    schemas: auth
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.default_schema: auth
+    open-in-view: false
+

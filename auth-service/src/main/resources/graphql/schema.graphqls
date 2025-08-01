@@ -1,0 +1,141 @@
+# ==============================================================
+#  Auth-Service  ›  GraphQL schema
+#  ver. 2025-07-19
+# ==============================================================
+
+# ---------- Custom scalars ------------------------------------
+scalar UUID          # java.util.UUID encoded as canonical text
+scalar Timestamp     # ISO-8601 instant (UTC)
+scalar Long          # signed 64-bit integer (expiresIn)
+
+# ---------- Enumerations --------------------------------------
+"""
+Application roles a user can have.
+Feel free to expand if you introduce finer-grained roles later.
+"""
+enum Role {
+    ADMIN
+    USER
+}
+
+# ---------- Object types --------------------------------------
+"""
+A registered user in the auth-service.
+"""
+type User {
+    id:         UUID!
+    email:      String!
+    firstName:  String
+    lastName:   String
+    roles:      [Role!]!
+    enabled:    Boolean!
+    createdAt:    Timestamp!
+    updatedAt:    Timestamp!
+}
+
+"""
+Returned by *login* and *refresh* operations.
+`expiresIn` is the access-token TTL (seconds).
+"""
+type LoginResponse {
+    accessToken:  String!
+    refreshToken: String!
+    expiresIn:    Long!
+}
+
+"""
+Each login attempt (successful or not) is persisted and can be streamed.
+"""
+type LoginAudit {
+    id:       UUID!
+    ts:       Timestamp!
+    user:     User!
+    ip:       String
+    success:  Boolean!
+}
+
+# ---------- Root Query ----------------------------------------
+type Query {
+    """
+    List **all** users (admin-only in practice).
+    """
+    users: [User!]!
+
+    """
+    The user associated with the presented access-token.
+    """
+    me: User!
+}
+
+# ---------- Root Mutation -------------------------------------
+type Mutation {
+    # ----- Auth flow --------------------------------------------
+
+    """Self-registration (role = USER, enabled=true)"""
+    register(
+        email:      String!
+        password:   String!
+        firstName:  String
+        lastName:   String
+    ): User!
+
+    """
+    Exchange credentials for an *access* + *refresh* token pair.
+    """
+    login(email: String!, password: String!): LoginResponse!
+
+    """
+    Obtain a fresh access-token (and refresh-token) using the
+    current, still-valid refresh-token.
+    """
+    refresh(refreshToken: String!): LoginResponse!
+
+    """
+    Invalidate the refresh-token (server-side logout).
+    Returns **true** if the token existed and was revoked.
+    """
+    logout(refreshToken: String!): Boolean!
+
+    # ----- User management (admin-only) -------------------------
+
+    """
+    Create a new user.
+    """
+    createUser(
+        email:      String!
+        password:   String!
+        firstName:  String
+        lastName:   String
+        roles:      [Role!] = [USER]
+        enabled:    Boolean  = true
+    ): User!
+
+    """
+    Partial update. Only non-null arguments are applied.
+    """
+    updateUser(
+        id:         UUID!
+        email:      String
+        password:   String
+        firstName:  String
+        lastName:   String
+        roles:      [Role!]
+        enabled:    Boolean
+    ): User!
+
+    """
+    Permanently remove a user.
+    Returns **true** if the user existed and was deleted.
+    """
+    deleteUser(id: UUID!): Boolean!
+}
+
+# ---------- Root Subscription ---------------------------------
+type Subscription {
+    """
+    Live stream of login attempts.
+    Optional *success* filter allows you to receive only failures (`false`)
+    or only successful logins (`true`).
+    """
+    loginAudit(success: Boolean): LoginAudit!
+}
