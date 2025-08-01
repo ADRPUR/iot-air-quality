@@ -7,6 +7,7 @@ import com.example.iot.alert.domain.service.AlertRuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.time.Instant;
@@ -31,6 +32,7 @@ public class AlertQueryController {
      * @param to       ISO-8601 UTC (inclusive) – optional
      * @param limit    max rows (default 100)
      */
+    @PreAuthorize("hasRole('user')")
     @QueryMapping
     public List<AlertLogDto> alertLogs(
             @Argument String  sensorId,

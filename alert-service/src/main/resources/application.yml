@@ -5,6 +5,12 @@ spring:
   profiles:
     active: dev
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:keys/public.pem
+
   # PostgreSQL / Timescale
   datasource:
     url: ${DB_URL}

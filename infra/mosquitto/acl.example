@@ -1,4 +1,0 @@
-# Placeholder ACL.
-# In CI we write:
-#   user $MQTT_USER
-#   topic sensors/#

@@ -22,3 +22,4 @@ __pycache__/
 /infra/mosquitto/generated/
 /alert-service/src/main/resources/.env
 /ingest-service/src/main/resources/.env
+/auth-service/src/main/resources/.env
