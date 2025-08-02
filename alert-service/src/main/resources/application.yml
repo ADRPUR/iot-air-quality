@@ -1,16 +1,12 @@
 server:
   port: 8081
 
+jwt:
+  secret: bXktc3VwZXItMzItYnl0ZS1zZWNyZXQtbGlrZS1ieXRlcw==
+
 spring:
   profiles:
     active: dev
-
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          public-key-location: classpath:keys/public.pem
-#          issuer-uri: http://auth-service:8083
 
   # PostgreSQL / Timescale
   datasource:

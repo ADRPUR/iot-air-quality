@@ -4,62 +4,35 @@ import {
     HttpLink,
     split,
 } from "@apollo/client";
-import {setContext} from "@apollo/client/link/context";
-import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
-import {getMainDefinition} from "@apollo/client/utilities";
-import {createClient as createWsClient} from "graphql-ws";
-import {onError} from "@apollo/client/link/error";
-import * as operation from "@apollo/client";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { createClient as createWsClient } from "graphql-ws";
+import { onError } from "@apollo/client/link/error";
 
 /** Helper — creates an Apollo Client for a URL base. */
 export function makeApolloClient(baseHttpUrl) {
     if (!baseHttpUrl) {
         throw new Error("Missing GraphQL HTTP URL");
     }
-    /* ---------------- HTTP (Bearer) ---------------- */
-    const httpLink = new HttpLink({uri: baseHttpUrl, credentials: "include"});
-
-    const authLink = setContext((_, {headers}) => {
-        if (operation.operationName === "login" ||
-            operation.operationName === "register") {
-            return { headers };
-        }
-        const token = localStorage.getItem("iot.access");
-        return {
-            headers: {
-                ...headers,
-                ...(token ? {Authorization: `Bearer ${token}`} : {}),
-            },
-        };
-    });
+    const httpLink = new HttpLink({ uri: baseHttpUrl, credentials: "include" });
 
     // auto convert http://host:port/graphql → ws://host:port/graphql
     const baseWsUrl = baseHttpUrl.replace(/^http/, "ws");
-
-    /* ---------------- WebSocket (Bearer) ----------- */
     const wsLink = new GraphQLWsLink(
-        createWsClient({
-            url: baseWsUrl,
-            lazy: true,
-            retryAttempts: 3,
-            connectionParams: () => {
-                const token = localStorage.getItem("iot.access");
-                return token ? {Authorization: `Bearer ${token}`} : {};
-            },
-        })
+        createWsClient({ url: baseWsUrl, lazy: true, retryAttempts: 3 })
     );
 
     // route: query+mutation → HTTP, subscription → WS
     const splitLink = split(
-        ({query}) => {
+        ({ query }) => {
             const def = getMainDefinition(query);
             return def.kind === "OperationDefinition" && def.operation === "subscription";
         },
         wsLink,
-        authLink.concat(httpLink)
+        httpLink
     );
 
-    const errorLink = onError(({graphQLErrors, networkError}) => {
+    const errorLink = onError(({ graphQLErrors, networkError }) => {
         if (graphQLErrors) {
             graphQLErrors.forEach(err => console.error("[GraphQL error]", err));
         }
@@ -71,8 +44,8 @@ export function makeApolloClient(baseHttpUrl) {
         cache: new InMemoryCache(),
         connectToDevTools: import.meta.env.DEV,
         defaultOptions: {
-            watchQuery: {fetchPolicy: "cache-and-network", errorPolicy: "all"},
-            query: {fetchPolicy: "network-only", errorPolicy: "all"},
+            watchQuery: { fetchPolicy: "cache-and-network", errorPolicy: "all" },
+            query:      { fetchPolicy: "network-only",      errorPolicy: "all" },
         },
     });
 }
@@ -87,9 +60,4 @@ export const ingestClient = makeApolloClient(
 /** Alert-service (notifications, rules) */
 export const alertClient = makeApolloClient(
     import.meta.env.VITE_ALERT_URL || "http://localhost:8081/graphql",
-);
-
-/** Auth-service (users & tokens) */
-export const authClient = makeApolloClient(
-    import.meta.env.VITE_AUTH_URL || "http://localhost:8083/graphql",
 );

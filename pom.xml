@@ -12,7 +12,6 @@
 
     <modules>
         <module>alert-service</module>
-        <module>auth-service</module>
         <module>ingest-service</module>
     </modules>
 
