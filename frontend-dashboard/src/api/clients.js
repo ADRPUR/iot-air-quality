@@ -4,6 +4,7 @@ import {
     HttpLink,
     split,
 } from "@apollo/client";
+import {setContext} from "@apollo/client/link/context";
 import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
 import {getMainDefinition} from "@apollo/client/utilities";
 import {createClient as createWsClient} from "graphql-ws";
@@ -14,12 +15,33 @@ export function makeApolloClient(baseHttpUrl) {
     if (!baseHttpUrl) {
         throw new Error("Missing GraphQL HTTP URL");
     }
+    /* ---------------- HTTP (Bearer) ---------------- */
     const httpLink = new HttpLink({uri: baseHttpUrl, credentials: "include"});
+
+    const authLink = setContext((_, {headers}) => {
+        const token = localStorage.getItem("iot.access");
+        return {
+            headers: {
+                ...headers,
+                ...(token ? {Authorization: `Bearer ${token}`} : {}),
+            },
+        };
+    });
 
     // auto convert http://host:port/graphql → ws://host:port/graphql
     const baseWsUrl = baseHttpUrl.replace(/^http/, "ws");
+
+    /* ---------------- WebSocket (Bearer) ----------- */
     const wsLink = new GraphQLWsLink(
-        createWsClient({url: baseWsUrl, lazy: true, retryAttempts: 3})
+        createWsClient({
+            url: baseWsUrl,
+            lazy: true,
+            retryAttempts: 3,
+            connectionParams: () => {
+                const token = localStorage.getItem("iot.access");
+                return token ? {Authorization: `Bearer ${token}`} : {};
+            },
+        })
     );
 
     // route: query+mutation → HTTP, subscription → WS
@@ -29,7 +51,7 @@ export function makeApolloClient(baseHttpUrl) {
             return def.kind === "OperationDefinition" && def.operation === "subscription";
         },
         wsLink,
-        httpLink
+        authLink.concat(httpLink)
     );
 
     const errorLink = onError(({graphQLErrors, networkError}) => {

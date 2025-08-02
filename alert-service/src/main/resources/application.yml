@@ -7,9 +7,10 @@ spring:
 
   security:
     oauth2:
-      resourceserver:
+      resource-server:
         jwt:
           public-key-location: classpath:keys/public.pem
+#          issuer-uri: http://auth-service:8083
 
   # PostgreSQL / Timescale
   datasource:

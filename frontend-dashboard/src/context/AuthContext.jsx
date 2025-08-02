@@ -53,7 +53,6 @@ export function AuthProvider({ children }) {
     }
 
     async function register({ email, password, firstName, lastName }) {
-        console.log("Registering user:", { email, firstName, lastName });
         if (!email) throw new Error("Email is required");
 
         const variables = {

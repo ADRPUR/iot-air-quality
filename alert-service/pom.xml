@@ -162,8 +162,7 @@
                 <version>3.11.0</version>
                 <configuration>
                     <release>${java.version}</release>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
+                    <compilerArgs>--enable-preview
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
@@ -177,6 +176,8 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
 
