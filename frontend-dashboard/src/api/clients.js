@@ -9,6 +9,7 @@ import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
 import {getMainDefinition} from "@apollo/client/utilities";
 import {createClient as createWsClient} from "graphql-ws";
 import {onError} from "@apollo/client/link/error";
+import * as operation from "@apollo/client";
 
 /** Helper — creates an Apollo Client for a URL base. */
 export function makeApolloClient(baseHttpUrl) {
@@ -19,6 +20,10 @@ export function makeApolloClient(baseHttpUrl) {
     const httpLink = new HttpLink({uri: baseHttpUrl, credentials: "include"});
 
     const authLink = setContext((_, {headers}) => {
+        if (operation.operationName === "login" ||
+            operation.operationName === "register") {
+            return { headers };
+        }
         const token = localStorage.getItem("iot.access");
         return {
             headers: {

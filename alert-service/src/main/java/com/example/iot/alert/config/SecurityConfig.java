@@ -46,15 +46,16 @@ public class SecurityConfig {
 
     @Bean
     SecurityWebFilterChain api(ServerHttpSecurity http) {
-        http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(Customizer.withDefaults())
 
                 .authorizeExchange(ex -> ex
-                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
+                        // handshake + introspecţie WS
                         .pathMatchers(HttpMethod.GET, "/graphql").permitAll()
+                        // login / register / refresh (POST)
+                        .pathMatchers(HttpMethod.POST, "/graphql").permitAll()
+                        // pre-flight
+                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated())
 
